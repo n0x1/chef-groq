@@ -13,23 +13,29 @@
 <script setup lang="ts">
 import Input from "./components/InputField.vue"
 import Topbar from  "./components/TopBar.vue"
-import { ref } from "vue"
 
 import Groq from "groq-sdk";
 const key = import.meta.env.VITE_GROQ_API_KEY;
 const groq = new Groq({ apiKey: key, dangerouslyAllowBrowser: true});
 
 async function main() {
-  const ingredientsOwned = document.getElementById("ingredients").textContent
+  const ingredientsElement = document.getElementById("ingredients");
+  const ingredientsOwned = ingredientsElement?.textContent || "";
   const chatCompletion = await getGroqChatCompletion(ingredientsOwned);
   const response = (chatCompletion.choices[0]?.message?.content || "");
-  if ( document.getElementById("response").textContent != "")
-    document.getElementById("response").textContent = ""
+  const responseElement = document.getElementById("response");
+  if (responseElement !== null) {
+    if (responseElement?.textContent !== "") {
+      responseElement.textContent = "";
+    }
 
-  document.getElementById("response").textContent = response
+    if (responseElement) {
+      responseElement.textContent = response;
+    }
+  }
 }
 
-async function getGroqChatCompletion(ingredientsOwned) {
+async function getGroqChatCompletion(ingredientsOwned: string) {
   return groq.chat.completions.create({
     messages: [
       {
